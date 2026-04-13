@@ -91,8 +91,8 @@ pipeline {
             }
             post {
                 always {
-                    // Affiche les résultats SpotBugs dans Jenkins
-                    recordIssues(tools: [spotBugs(pattern: '**/spotbugsXml.xml')])
+                    // Rend le rapport disponible dans les artefacts au lieu d'utiliser le plugin Warnings NG qui n'est pas installé
+                    archiveArtifacts allowEmptyArchive: true, artifacts: '**/spotbugsXml.xml'
                 }
             }
         }
