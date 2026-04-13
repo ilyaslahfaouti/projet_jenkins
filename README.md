@@ -9,7 +9,7 @@ Projet Maven pour le TP Jenkins avec intégration CI/CD complète.
 - **Tests** : JUnit 5 + Mockito
 - **Qualité Codes** : Checkstyle, PMD, SpotBugs, JaCoCo
 
-## Pipeline Jenkins
+## Pipeline Jenkinss
 
 Le pipeline automatisé inclut :
 1. **Checkout** - Récupération du code depuis GitHub
