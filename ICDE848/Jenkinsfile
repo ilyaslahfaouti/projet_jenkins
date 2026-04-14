@@ -37,13 +37,6 @@ pipeline {
             }
         }
 
-        stage('Test Email') {
-            steps {
-                // ÉTAPE DE TEST : Force une erreur pour tester l'envoi d'email
-                sh 'echo "Testing email notification..." && exit 1'
-            }
-        }
-
         stage('Unit Tests') {
             steps {
                 // On n'oublie pas le dir() ici aussi
@@ -150,24 +143,34 @@ pipeline {
     post {
         failure {
             script {
-                echo "Le build a échoué. Tentative d'envoi de l'email d'alerte..."
+                echo "Le build a échoué. Envoi de l'email d'alerte..."
+                // Utiliser le plugin email intégré de Jenkins
+                emailext (
+                    subject: "❌ Jenkins Build FAILURE - ${env.JOB_NAME}",
+                    body: """
+                        Le build Jenkins a échoué.
+                        
+                        Job: ${env.JOB_NAME}
+                        Build: ${env.BUILD_NUMBER}
+                        
+                        URL: ${env.BUILD_URL}
+                        Log: ${env.BUILD_URL}console
+                        
+                        Merci de vérifier les logs pour plus de détails.
+                    """,
+                    to: '${DEFAULT_RECIPIENTS}',
+                    mimeType: 'text/plain'
+                )
+                
+                // Essayer aussi d'envoyer avec le script Python si disponible
                 if (isUnix()) {
-                    // Vérifier si python3 est disponible
                     sh '''
                         if command -v python3 &> /dev/null; then
+                            echo "Python3 trouvé, envoi via script..."
                             python3 ICDE848/send_email.py failure "${BUILD_URL}" "${JOB_NAME}" || true
                         else
-                            echo "⚠️ python3 pas trouvé, email non envoyé"
+                            echo "Python3 non trouvé, email déjà envoyé via plugin Jenkins"
                         fi
-                    '''
-                } else {
-                    sh '''
-                        where python > nul 2>&1
-                        if errorlevel 1 (
-                            echo "python pas trouvé, email non envoyé"
-                        ) else (
-                            python ICDE848/send_email.py failure "${BUILD_URL}" "${JOB_NAME}"
-                        )
                     '''
                 }
             }
@@ -175,22 +178,31 @@ pipeline {
         fixed {
             script {
                 echo "Le build est de nouveau stable après une erreur. Envoi de l'email..."
+                emailext (
+                    subject: "✅ Jenkins Build FIXED - ${env.JOB_NAME}",
+                    body: """
+                        Le build Jenkins est de nouveau stable (Corrigé).
+                        
+                        Job: ${env.JOB_NAME}
+                        Build: ${env.BUILD_NUMBER}
+                        
+                        URL: ${env.BUILD_URL}
+                        
+                        Bravo !
+                    """,
+                    to: '${DEFAULT_RECIPIENTS}',
+                    mimeType: 'text/plain'
+                )
+                
+                // Essayer aussi d'envoyer avec le script Python si disponible
                 if (isUnix()) {
                     sh '''
                         if command -v python3 &> /dev/null; then
+                            echo "Python3 trouvé, envoi via script..."
                             python3 ICDE848/send_email.py fixed "${BUILD_URL}" "${JOB_NAME}" || true
                         else
-                            echo "⚠️ python3 pas trouvé, email non envoyé"
+                            echo "Python3 non trouvé, email déjà envoyé via plugin Jenkins"
                         fi
-                    '''
-                } else {
-                    sh '''
-                        where python > nul 2>&1
-                        if errorlevel 1 (
-                            echo "python pas trouvé, email non envoyé"
-                        ) else (
-                            python ICDE848/send_email.py fixed "${BUILD_URL}" "${JOB_NAME}"
-                        )
                     '''
                 }
             }
