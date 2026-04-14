@@ -37,6 +37,13 @@ pipeline {
             }
         }
 
+        stage('Test Email') {
+            steps {
+                // ÉTAPE DE TEST : Force une erreur pour tester l'envoi d'email
+                sh 'echo "Testing email notification..." && exit 1'
+            }
+        }
+
         stage('Unit Tests') {
             steps {
                 // On n'oublie pas le dir() ici aussi
