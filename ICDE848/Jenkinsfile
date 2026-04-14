@@ -159,51 +159,11 @@ pipeline {
     post {
         failure {
             echo "Le build a échoué ❌"
-            // Essayer d'envoyer l'email, mais ne pas bloquer le build
-            catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-                timeout(time: 5, unit: 'SECONDS') {
-                    emailext(
-                        subject: "Jenkins Build FAILED - ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                        body: """
-                            Le build Jenkins a échoué.
-                            
-                            Job Name: ${env.JOB_NAME}
-                            Build Number: ${env.BUILD_NUMBER}
-                            Build URL: ${env.BUILD_URL}
-                            
-                            Consultez les logs complets ici : ${env.BUILD_URL}console
-                        """,
-                        to: "ilahfaouti@gmail.com",
-                        from: "jenkins@example.com",
-                        mimeType: "text/plain",
-                        attachLog: false
-                    )
-                }
-            }
+            // Note: Email notification disabled until SMTP is configured in Jenkins
         }
         success {
             echo "Le build a réussi ✅"
-            // Essayer d'envoyer l'email, mais ne pas bloquer le build
-            catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-                timeout(time: 5, unit: 'SECONDS') {
-                    emailext(
-                        subject: "Jenkins Build SUCCESS - ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                        body: """
-                            Le build Jenkins a réussi.
-                            
-                            Job Name: ${env.JOB_NAME}
-                            Build Number: ${env.BUILD_NUMBER}
-                            Build URL: ${env.BUILD_URL}
-                            
-                            Consultez le build ici : ${env.BUILD_URL}
-                        """,
-                        to: "ilahfaouti@gmail.com",
-                        from: "jenkins@example.com",
-                        mimeType: "text/plain",
-                        attachLog: false
-                    )
-                }
-            }
+            // Note: Email notification disabled until SMTP is configured in Jenkins
         }
     }
 }
