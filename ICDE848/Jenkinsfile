@@ -1,5 +1,11 @@
 pipeline {
     agent any
+    
+    // Timeout global pour le pipeline
+    options {
+        timeout(time: 30, unit: 'MINUTES')
+        timestamps()
+    }
 
     // 1. AJOUT : On déclare l'outil Maven pour que Jenkins sache exécuter la commande 'mvn'
     // Note : Les noms doivent correspondre à ceux configurés dans "Administrer Jenkins > Tools"
@@ -16,21 +22,23 @@ pipeline {
         }
 
         stage('Build') {
-            steps {
-                // 2. AJOUT : On se déplace dans le bon dossier avant de lancer les commandes
-                dir('ICDE848') {
-                    script {
-                        if (isUnix()) {
-                            sh '''
-                                # Find Java if JAVA_HOME is not set
-                                if [ -z "$JAVA_HOME" ]; then
-                                    export JAVA_HOME=$(readlink -f /usr/bin/java | sed "s:bin/java::")
-                                fi
-                                # Run Maven
-                                mvn clean compile -B
-                            '''
-                        } else {
-                            bat 'mvn clean compile -B'
+            timeout(time: 10, unit: 'MINUTES') {
+                steps {
+                    // 2. AJOUT : On se déplace dans le bon dossier avant de lancer les commandes
+                    dir('ICDE848') {
+                        script {
+                            if (isUnix()) {
+                                sh '''
+                                    # Find Java if JAVA_HOME is not set
+                                    if [ -z "$JAVA_HOME" ]; then
+                                        export JAVA_HOME=$(readlink -f /usr/bin/java | sed "s:bin/java::")
+                                    fi
+                                    # Run Maven
+                                    mvn clean compile -B
+                                '''
+                            } else {
+                                bat 'mvn clean compile -B'
+                            }
                         }
                     }
                 }
@@ -38,22 +46,25 @@ pipeline {
         }
 
         stage('Unit Tests') {
-            steps {
-                // On n'oublie pas le dir() ici aussi
-                dir('ICDE848') {
-                    script {
-                        if (isUnix()) {
-                            sh '''
-                                if [ -z "$JAVA_HOME" ]; then
-                                    export JAVA_HOME=$(readlink -f /usr/bin/java | sed "s:bin/java::")
-                                fi
-                                mvn test -B
-                            '''
-                        } else {
-                            bat 'mvn test -B'
+            timeout(time: 10, unit: 'MINUTES') {
+                steps {
+                    // On n'oublie pas le dir() ici aussi
+                    dir('ICDE848') {
+                        script {
+                            if (isUnix()) {
+                                sh '''
+                                    if [ -z "$JAVA_HOME" ]; then
+                                        export JAVA_HOME=$(readlink -f /usr/bin/java | sed "s:bin/java::")
+                                    fi
+                                    mvn test -B
+                                '''
+                            } else {
+                                bat 'mvn test -B'
+                            }
                         }
                     }
                 }
+            }
             }
             post {
                 always {
@@ -63,22 +74,25 @@ pipeline {
         }
 
         stage('Jacoco') {
-            steps {
-                // Analyse de la couverture de code avec Jacoco
-                dir('ICDE848') {
-                    script {
-                        if (isUnix()) {
-                            sh '''
-                                if [ -z "$JAVA_HOME" ]; then
-                                    export JAVA_HOME=$(readlink -f /usr/bin/java | sed "s:bin/java::")
-                                fi
-                                mvn verify -B -DskipTests
-                            '''
-                        } else {
-                            bat 'mvn verify -B -DskipTests'
+            timeout(time: 10, unit: 'MINUTES') {
+                steps {
+                    // Analyse de la couverture de code avec Jacoco
+                    dir('ICDE848') {
+                        script {
+                            if (isUnix()) {
+                                sh '''
+                                    if [ -z "$JAVA_HOME" ]; then
+                                        export JAVA_HOME=$(readlink -f /usr/bin/java | sed "s:bin/java::")
+                                    fi
+                                    mvn verify -B -DskipTests
+                                '''
+                            } else {
+                                bat 'mvn verify -B -DskipTests'
+                            }
                         }
                     }
                 }
+            }
             }
             post {
                 always {
@@ -89,22 +103,25 @@ pipeline {
         }
 
         stage('SpotBugs') {
-            steps {
-                // Analyse des bugs avec SpotBugs
-                dir('ICDE848') {
-                    script {
-                        if (isUnix()) {
-                            sh '''
-                                if [ -z "$JAVA_HOME" ]; then
-                                    export JAVA_HOME=$(readlink -f /usr/bin/java | sed "s:bin/java::")
-                                fi
-                                mvn spotbugs:check -B
-                            '''
-                        } else {
-                            bat 'mvn spotbugs:check -B'
+            timeout(time: 10, unit: 'MINUTES') {
+                steps {
+                    // Analyse des bugs avec SpotBugs
+                    dir('ICDE848') {
+                        script {
+                            if (isUnix()) {
+                                sh '''
+                                    if [ -z "$JAVA_HOME" ]; then
+                                        export JAVA_HOME=$(readlink -f /usr/bin/java | sed "s:bin/java::")
+                                    fi
+                                    mvn spotbugs:check -B
+                                '''
+                            } else {
+                                bat 'mvn spotbugs:check -B'
+                            }
                         }
                     }
                 }
+            }
             }
             post {
                 always {
@@ -115,22 +132,25 @@ pipeline {
         }
 
         stage('Checkstyle') {
-            steps {
-                // Et le dir() ici également
-                dir('ICDE848') {
-                    script {
-                        if (isUnix()) {
-                            sh '''
-                                if [ -z "$JAVA_HOME" ]; then
-                                    export JAVA_HOME=$(readlink -f /usr/bin/java | sed "s:bin/java::")
-                                fi
-                                mvn checkstyle:checkstyle -B -Dcheckstyle.config.location=checkstyle.xml
-                            '''
-                        } else {
-                            bat 'mvn checkstyle:checkstyle -B -Dcheckstyle.config.location=checkstyle.xml'
+            timeout(time: 10, unit: 'MINUTES') {
+                steps {
+                    // Et le dir() ici également
+                    dir('ICDE848') {
+                        script {
+                            if (isUnix()) {
+                                sh '''
+                                    if [ -z "$JAVA_HOME" ]; then
+                                        export JAVA_HOME=$(readlink -f /usr/bin/java | sed "s:bin/java::")
+                                    fi
+                                    mvn checkstyle:checkstyle -B -Dcheckstyle.config.location=checkstyle.xml
+                                '''
+                            } else {
+                                bat 'mvn checkstyle:checkstyle -B -Dcheckstyle.config.location=checkstyle.xml'
+                            }
                         }
                     }
                 }
+            }
             }
             post {
                 always {
@@ -143,39 +163,51 @@ pipeline {
     post {
         failure {
             echo "Le build a échoué ❌"
-            emailext(
-                subject: "Jenkins Build FAILED - ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                body: """
-                    Le build Jenkins a échoué.
-                    
-                    Job Name: ${env.JOB_NAME}
-                    Build Number: ${env.BUILD_NUMBER}
-                    Build URL: ${env.BUILD_URL}
-                    
-                    Consultez les logs complets ici : ${env.BUILD_URL}console
-                """,
-                to: "ilahfaouti@gmail.com",
-                from: "jenkins@example.com",
-                mimeType: "text/plain"
-            )
+            // Essayer d'envoyer l'email, mais ne pas bloquer le build
+            catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+                timeout(time: 5, unit: 'SECONDS') {
+                    emailext(
+                        subject: "Jenkins Build FAILED - ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                        body: """
+                            Le build Jenkins a échoué.
+                            
+                            Job Name: ${env.JOB_NAME}
+                            Build Number: ${env.BUILD_NUMBER}
+                            Build URL: ${env.BUILD_URL}
+                            
+                            Consultez les logs complets ici : ${env.BUILD_URL}console
+                        """,
+                        to: "ilahfaouti@gmail.com",
+                        from: "jenkins@example.com",
+                        mimeType: "text/plain",
+                        attachLog: false
+                    )
+                }
+            }
         }
         success {
             echo "Le build a réussi ✅"
-            emailext(
-                subject: "Jenkins Build SUCCESS - ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                body: """
-                    Le build Jenkins a réussi.
-                    
-                    Job Name: ${env.JOB_NAME}
-                    Build Number: ${env.BUILD_NUMBER}
-                    Build URL: ${env.BUILD_URL}
-                    
-                    Consultez le build ici : ${env.BUILD_URL}
-                """,
-                to: "ilahfaouti@gmail.com",
-                from: "jenkins@example.com",
-                mimeType: "text/plain"
-            )
+            // Essayer d'envoyer l'email, mais ne pas bloquer le build
+            catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+                timeout(time: 5, unit: 'SECONDS') {
+                    emailext(
+                        subject: "Jenkins Build SUCCESS - ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                        body: """
+                            Le build Jenkins a réussi.
+                            
+                            Job Name: ${env.JOB_NAME}
+                            Build Number: ${env.BUILD_NUMBER}
+                            Build URL: ${env.BUILD_URL}
+                            
+                            Consultez le build ici : ${env.BUILD_URL}
+                        """,
+                        to: "ilahfaouti@gmail.com",
+                        from: "jenkins@example.com",
+                        mimeType: "text/plain",
+                        attachLog: false
+                    )
+                }
+            }
         }
     }
 }
