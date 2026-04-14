@@ -71,8 +71,6 @@ pipeline {
                 }
             }
         }
-
-
         stage('Jacoco') {
             steps {
                 timeout(time: 10, unit: 'MINUTES') {
