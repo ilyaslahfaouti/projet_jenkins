@@ -122,7 +122,6 @@ pipeline {
                     }
                 }
             }
-            }
             post {
                 always {
                     // Rend le rapport disponible dans les artefacts au lieu d'utiliser le plugin Warnings NG qui n'est pas installé
