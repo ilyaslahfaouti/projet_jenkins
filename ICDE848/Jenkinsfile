@@ -82,12 +82,8 @@ pipeline {
             }
             post {
                 always {
-                    // Publie le rapport de couverture Jacoco
-                    jacoco(
-                        execPattern: '**/target/jacoco.exec',
-                        classPattern: '**/target/classes',
-                        sourcePattern: '**/src/main/java'
-                    )
+                    // Archive les rapports de couverture Jacoco (plugin jacoco non installé)
+                    archiveArtifacts allowEmptyArchive: true, artifacts: '**/target/jacoco.exec,**/target/site/jacoco/**'
                 }
             }
         }
