@@ -6,12 +6,6 @@ pipeline {
     tools {
         maven 'Maven3'
     }
-    
-    environment {
-        // Définir JAVA_HOME avec le chemin Maven qui inclut Java
-        MAVEN_HOME="${tool 'Maven3'}"
-        JAVA_HOME="${MAVEN_HOME}/bin"
-    }
 
     stages {
         stage('Checkout') {
@@ -27,7 +21,14 @@ pipeline {
                 dir('ICDE848') {
                     script {
                         if (isUnix()) {
-                            sh 'mvn clean compile -B'
+                            sh '''
+                                # Find Java if JAVA_HOME is not set
+                                if [ -z "$JAVA_HOME" ]; then
+                                    export JAVA_HOME=$(readlink -f /usr/bin/java | sed "s:bin/java::")
+                                fi
+                                # Run Maven
+                                mvn clean compile -B
+                            '''
                         } else {
                             bat 'mvn clean compile -B'
                         }
@@ -42,7 +43,12 @@ pipeline {
                 dir('ICDE848') {
                     script {
                         if (isUnix()) {
-                            sh 'mvn test -B'
+                            sh '''
+                                if [ -z "$JAVA_HOME" ]; then
+                                    export JAVA_HOME=$(readlink -f /usr/bin/java | sed "s:bin/java::")
+                                fi
+                                mvn test -B
+                            '''
                         } else {
                             bat 'mvn test -B'
                         }
@@ -62,7 +68,12 @@ pipeline {
                 dir('ICDE848') {
                     script {
                         if (isUnix()) {
-                            sh 'mvn verify -B -DskipTests'
+                            sh '''
+                                if [ -z "$JAVA_HOME" ]; then
+                                    export JAVA_HOME=$(readlink -f /usr/bin/java | sed "s:bin/java::")
+                                fi
+                                mvn verify -B -DskipTests
+                            '''
                         } else {
                             bat 'mvn verify -B -DskipTests'
                         }
@@ -87,7 +98,12 @@ pipeline {
                 dir('ICDE848') {
                     script {
                         if (isUnix()) {
-                            sh 'mvn spotbugs:check -B'
+                            sh '''
+                                if [ -z "$JAVA_HOME" ]; then
+                                    export JAVA_HOME=$(readlink -f /usr/bin/java | sed "s:bin/java::")
+                                fi
+                                mvn spotbugs:check -B
+                            '''
                         } else {
                             bat 'mvn spotbugs:check -B'
                         }
@@ -108,7 +124,12 @@ pipeline {
                 dir('ICDE848') {
                     script {
                         if (isUnix()) {
-                            sh 'mvn checkstyle:checkstyle -B -Dcheckstyle.config.location=checkstyle.xml'
+                            sh '''
+                                if [ -z "$JAVA_HOME" ]; then
+                                    export JAVA_HOME=$(readlink -f /usr/bin/java | sed "s:bin/java::")
+                                fi
+                                mvn checkstyle:checkstyle -B -Dcheckstyle.config.location=checkstyle.xml
+                            '''
                         } else {
                             bat 'mvn checkstyle:checkstyle -B -Dcheckstyle.config.location=checkstyle.xml'
                         }
