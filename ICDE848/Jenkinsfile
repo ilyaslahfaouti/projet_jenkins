@@ -22,8 +22,8 @@ pipeline {
         }
 
         stage('Build') {
-            timeout(time: 10, unit: 'MINUTES') {
-                steps {
+            steps {
+                timeout(time: 10, unit: 'MINUTES') {
                     // 2. AJOUT : On se déplace dans le bon dossier avant de lancer les commandes
                     dir('ICDE848') {
                         script {
@@ -46,8 +46,8 @@ pipeline {
         }
 
         stage('Unit Tests') {
-            timeout(time: 10, unit: 'MINUTES') {
-                steps {
+            steps {
+                timeout(time: 10, unit: 'MINUTES') {
                     // On n'oublie pas le dir() ici aussi
                     dir('ICDE848') {
                         script {
@@ -73,8 +73,8 @@ pipeline {
         }
 
         stage('Jacoco') {
-            timeout(time: 10, unit: 'MINUTES') {
-                steps {
+            steps {
+                timeout(time: 10, unit: 'MINUTES') {
                     // Analyse de la couverture de code avec Jacoco
                     dir('ICDE848') {
                         script {
@@ -101,8 +101,8 @@ pipeline {
         }
 
         stage('SpotBugs') {
-            timeout(time: 10, unit: 'MINUTES') {
-                steps {
+            steps {
+                timeout(time: 10, unit: 'MINUTES') {
                     // Analyse des bugs avec SpotBugs
                     dir('ICDE848') {
                         script {
@@ -129,8 +129,8 @@ pipeline {
         }
 
         stage('Checkstyle') {
-            timeout(time: 10, unit: 'MINUTES') {
-                steps {
+            steps {
+                timeout(time: 10, unit: 'MINUTES') {
                     // Et le dir() ici également
                     dir('ICDE848') {
                         script {
