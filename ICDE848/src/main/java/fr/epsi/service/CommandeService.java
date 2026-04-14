@@ -40,6 +40,7 @@ public class CommandeService {
         if (pourcentage < 0 || pourcentage > 100) {
             throw new IllegalArgumentException("Remise invalide : " + pourcentage);
         }
+        int erreur = 1 / 0; // Erreur intentionnelle pour tester les notifications
         return total * (1 - pourcentage / 100.0);
     }
 
