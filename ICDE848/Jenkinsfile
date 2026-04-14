@@ -142,70 +142,40 @@ pipeline {
 
     post {
         failure {
-            script {
-                echo "Le build a échoué. Envoi de l'email d'alerte..."
-                // Utiliser le plugin email intégré de Jenkins
-                emailext (
-                    subject: "❌ Jenkins Build FAILURE - ${env.JOB_NAME}",
-                    body: """
-                        Le build Jenkins a échoué.
-                        
-                        Job: ${env.JOB_NAME}
-                        Build: ${env.BUILD_NUMBER}
-                        
-                        URL: ${env.BUILD_URL}
-                        Log: ${env.BUILD_URL}console
-                        
-                        Merci de vérifier les logs pour plus de détails.
-                    """,
-                    to: '${DEFAULT_RECIPIENTS}',
-                    mimeType: 'text/plain'
-                )
-                
-                // Essayer aussi d'envoyer avec le script Python si disponible
-                if (isUnix()) {
-                    sh '''
-                        if command -v python3 &> /dev/null; then
-                            echo "Python3 trouvé, envoi via script..."
-                            python3 ICDE848/send_email.py failure "${BUILD_URL}" "${JOB_NAME}" || true
-                        else
-                            echo "Python3 non trouvé, email déjà envoyé via plugin Jenkins"
-                        fi
-                    '''
-                }
-            }
+            echo "Le build a échoué ❌"
+            emailext(
+                subject: "Jenkins Build FAILED - ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                body: """
+                    Le build Jenkins a échoué.
+                    
+                    Job Name: ${env.JOB_NAME}
+                    Build Number: ${env.BUILD_NUMBER}
+                    Build URL: ${env.BUILD_URL}
+                    
+                    Consultez les logs complets ici : ${env.BUILD_URL}console
+                """,
+                to: "ilahfaouti@gmail.com",
+                from: "jenkins@example.com",
+                mimeType: "text/plain"
+            )
         }
-        fixed {
-            script {
-                echo "Le build est de nouveau stable après une erreur. Envoi de l'email..."
-                emailext (
-                    subject: "✅ Jenkins Build FIXED - ${env.JOB_NAME}",
-                    body: """
-                        Le build Jenkins est de nouveau stable (Corrigé).
-                        
-                        Job: ${env.JOB_NAME}
-                        Build: ${env.BUILD_NUMBER}
-                        
-                        URL: ${env.BUILD_URL}
-                        
-                        Bravo !
-                    """,
-                    to: '${DEFAULT_RECIPIENTS}',
-                    mimeType: 'text/plain'
-                )
-                
-                // Essayer aussi d'envoyer avec le script Python si disponible
-                if (isUnix()) {
-                    sh '''
-                        if command -v python3 &> /dev/null; then
-                            echo "Python3 trouvé, envoi via script..."
-                            python3 ICDE848/send_email.py fixed "${BUILD_URL}" "${JOB_NAME}" || true
-                        else
-                            echo "Python3 non trouvé, email déjà envoyé via plugin Jenkins"
-                        fi
-                    '''
-                }
-            }
+        success {
+            echo "Le build a réussi ✅"
+            emailext(
+                subject: "Jenkins Build SUCCESS - ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                body: """
+                    Le build Jenkins a réussi.
+                    
+                    Job Name: ${env.JOB_NAME}
+                    Build Number: ${env.BUILD_NUMBER}
+                    Build URL: ${env.BUILD_URL}
+                    
+                    Consultez le build ici : ${env.BUILD_URL}
+                """,
+                to: "ilahfaouti@gmail.com",
+                from: "jenkins@example.com",
+                mimeType: "text/plain"
+            )
         }
     }
 }
