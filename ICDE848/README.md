@@ -3,8 +3,6 @@
 
 ---
 
-## 📁 S
-
 ```
 tp-jenkins/
 ├── pom.xml                          ← Configuration Maven complète
