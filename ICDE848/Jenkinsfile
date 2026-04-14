@@ -4,8 +4,8 @@ pipeline {
     // 1. AJOUT : On déclare l'outil Maven pour que Jenkins sache exécuter la commande 'mvn'
     // Note : Les noms doivent correspondre à ceux configurés dans "Administrer Jenkins > Tools"
     tools {
-        maven 'Maven 3.8.1'
-        jdk 'OpenJDK 17'
+        maven 'Maven3'
+        jdk 'JDK17'
     }
 
     stages {
