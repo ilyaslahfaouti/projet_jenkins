@@ -4,12 +4,13 @@ pipeline {
     // 1. AJOUT : On déclare l'outil Maven pour que Jenkins sache exécuter la commande 'mvn'
     // Note : Les noms doivent correspondre à ceux configurés dans "Administrer Jenkins > Tools"
     tools {
-        maven 'Maven 3.8.1'
+        maven 'Maven3'
     }
     
     environment {
-        // Essayer de définir JAVA_HOME manuellement si le JDK n'est pas configuré
-        JAVA_HOME="${tool 'Java'}"
+        // Définir JAVA_HOME avec le chemin Maven qui inclut Java
+        MAVEN_HOME="${tool 'Maven3'}"
+        JAVA_HOME="${MAVEN_HOME}/bin"
     }
 
     stages {
