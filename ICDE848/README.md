@@ -25,7 +25,7 @@ tp-jenkins/
 
 ---
 
-## 🚀 Démarrage rapide
+##
 
 ### Prérequis
 - Java 17 (`java -version`)
