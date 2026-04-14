@@ -2,10 +2,10 @@ pipeline {
     agent any
 
     // 1. AJOUT : On déclare l'outil Maven pour que Jenkins sache exécuter la commande 'mvn'
-    // ⚠️ IMPORTANT : Remplace 'Maven_3' par le nom exact que tu as donné à ton Maven dans Jenkins (Administrer Jenkins > Tools)
+    // Note : Les noms doivent correspondre à ceux configurés dans "Administrer Jenkins > Tools"
     tools {
-        maven 'Maven3'
-        jdk 'JDK17'
+        maven 'Maven 3.8.1'
+        jdk 'OpenJDK 17'
     }
 
     stages {
@@ -121,11 +121,25 @@ pipeline {
     post {
         failure {
             script {
-                echo "Le build a échoué. Envoi de l'email d'alerte..."
+                echo "Le build a échoué. Tentative d'envoi de l'email d'alerte..."
                 if (isUnix()) {
-                    sh "python3 ICDE848/send_email.py failure \"${env.BUILD_URL}\" \"${env.JOB_NAME}\""
+                    // Vérifier si python3 est disponible
+                    sh '''
+                        if command -v python3 &> /dev/null; then
+                            python3 ICDE848/send_email.py failure "${BUILD_URL}" "${JOB_NAME}" || true
+                        else
+                            echo "⚠️ python3 pas trouvé, email non envoyé"
+                        fi
+                    '''
                 } else {
-                    bat "python ICDE848/send_email.py failure \"${env.BUILD_URL}\" \"${env.JOB_NAME}\""
+                    sh '''
+                        where python > nul 2>&1
+                        if errorlevel 1 (
+                            echo "python pas trouvé, email non envoyé"
+                        ) else (
+                            python ICDE848/send_email.py failure "${BUILD_URL}" "${JOB_NAME}"
+                        )
+                    '''
                 }
             }
         }
@@ -133,9 +147,22 @@ pipeline {
             script {
                 echo "Le build est de nouveau stable après une erreur. Envoi de l'email..."
                 if (isUnix()) {
-                    sh "python3 ICDE848/send_email.py fixed \"${env.BUILD_URL}\" \"${env.JOB_NAME}\""
+                    sh '''
+                        if command -v python3 &> /dev/null; then
+                            python3 ICDE848/send_email.py fixed "${BUILD_URL}" "${JOB_NAME}" || true
+                        else
+                            echo "⚠️ python3 pas trouvé, email non envoyé"
+                        fi
+                    '''
                 } else {
-                    bat "python ICDE848/send_email.py fixed \"${env.BUILD_URL}\" \"${env.JOB_NAME}\""
+                    sh '''
+                        where python > nul 2>&1
+                        if errorlevel 1 (
+                            echo "python pas trouvé, email non envoyé"
+                        ) else (
+                            python ICDE848/send_email.py fixed "${BUILD_URL}" "${JOB_NAME}"
+                        )
+                    '''
                 }
             }
         }
